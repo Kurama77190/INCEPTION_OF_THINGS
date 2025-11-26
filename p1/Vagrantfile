@@ -3,19 +3,17 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "debian/bookworm64"
 
-  # Désactive le provider par défaut
-  config.vm.provider :virtualbox do |vb|
-    vb.gui = false
-  end
-
   ## Machine 1 : K3s Server
   config.vm.define "sben-tayS" do |srv|
     srv.vm.hostname = "sben-tayS"
     srv.vm.network "private_network", ip: "192.168.56.110"
 
-    srv.vm.provider :virtualbox do |hv|
+    srv.vm.provider :libvirt do |hv|
       hv.cpus = 1
       hv.memory = 1024
+      hv.driver = "kvm"
+      hv.machine_type = "pc"
+      hv.uri = "qemu:///system"
     end
 
     srv.vm.provision "shell", path: "scripts/install_k3s_server.sh"
@@ -26,9 +24,12 @@ Vagrant.configure("2") do |config|
     wrk.vm.hostname = "sben-taySW"
     wrk.vm.network "private_network", ip: "192.168.56.111"
 
-    wrk.vm.provider :virtualbox do |hv|
+    wrk.vm.provider :libvirt do |hv|
       hv.cpus = 1
       hv.memory = 1024
+      hv.driver = "kvm"
+      hv.machine_type = "pc"
+      hv.uri = "qemu:///system"
     end
 
     wrk.vm.provision "shell", path: "scripts/install_k3s_worker.sh"
