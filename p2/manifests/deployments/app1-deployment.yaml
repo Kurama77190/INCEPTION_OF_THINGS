@@ -1,0 +1,28 @@
+#Version de l'API Kubernetes stable pour les déploiements
+apiVersion: apps/v1
+#Type de ressource Kubernetes
+kind: Deployment
+#Définition des métadonnées du déploiement
+metadata:
+  name: app1 #Nom du déploiement
+  labels:
+    app: app1 #Étiquette pour identifier les ressources associées
+
+spec:
+  replicas: 1 # Nombre de pods identique a maintenir actifs
+  selector: #Comment le Deployment trouve ses pods
+    matchLabels:
+      app: app1 #Étiquette pour sélectionner les pods
+  template:
+    metadata:
+      labels:
+        app: app1 #Étiquette pour les pods
+    spec:
+    # Définition des conteneurs dans le pod
+      containers:
+      - name: app1
+        image: hashicorp/http-echo
+        args:
+          - "-text=Hello from App 1"
+        ports:
+        - containerPort: 5678
