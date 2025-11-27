@@ -1,1 +1,0 @@
-{"nfs":{"/vagrant":{"type":"nfs","nfs_version":"4","nfs_udp":false,"guestpath":"/vagrant","hostpath":"/home/sben-tay/INCEPTION_OF_THINGS/p1","disabled":false,"__vagrantfile":true,"map_uid":1000,"map_gid":989,"uuid":"3554928900","linux__nfs_options":["rw","no_subtree_check","all_squash","anonuid=1000","anongid=989","fsid=3554928900"]}}}
