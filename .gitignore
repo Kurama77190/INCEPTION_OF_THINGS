@@ -1,0 +1,14 @@
+# Vagrant
+.vagrant/
+*.vagrant
+
+# Vagrant log files
+vagrant.log
+
+# Box metadata
+.box/
+
+# SSH keys
+*.key
+*.pem
+
