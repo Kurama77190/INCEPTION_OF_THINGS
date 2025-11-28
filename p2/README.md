@@ -123,6 +123,16 @@ vagrant destroy
 
 # Redémarrer proprement
 vagrant destroy -f && vagrant up
+
+# Lister toutes les VMs libvirt
+sudo virsh list --all
+
+# Forcer l'arrêt d'une VM libvirt
+sudo virsh destroy <name> 2>/dev/null
+
+# Supprimer une VM libvirt et son stockage
+sudo virsh undefine <name> --remove-all-storage
+
 ```
 
 ## 📁 Structure du projet
