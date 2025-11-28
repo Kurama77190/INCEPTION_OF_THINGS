@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
 
     srv.vm.provider :libvirt do |hv|
       hv.cpus = 1
-      hv.memory = 1024
+      hv.memory = 2048
       hv.driver = "kvm"
       hv.machine_type = "pc"
       hv.uri = "qemu:///system"
