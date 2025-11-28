@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: development
+  namespace: argocd
+spec:
+  description: Development project for IoT 42 applications
+  
+  # Repos autorisés
+  sourceRepos:
+  - '*'  # Tous les repos (ou spécifie le tien)
+  
+  # Destinations autorisées
+  destinations:
+  - namespace: '*'  # Tous les namespaces
+    server: https://kubernetes.default.svc
+  
+  # Permissions
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
