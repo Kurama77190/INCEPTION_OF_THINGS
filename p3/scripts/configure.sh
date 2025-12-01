@@ -2,53 +2,82 @@
 
 set -e
 
+# Fonction spinner
+spinner() {
+    local pid=$1
+    local delay=0.1
+    local spinstr='|/-\'
+    tput civis  # Masquer le curseur
+    while ps -p $pid > /dev/null 2>&1; do
+        local temp=${spinstr#?}
+        printf " [%c]  " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        printf "\b\b\b\b\b\b"
+    done
+    printf "    \b\b\b\b"
+    tput cnorm  # Réafficher le curseur
+}
+
 echo "======================================"
 echo "  P3: K3d + ArgoCD Installation"
 echo "======================================"
 
 # Créer le cluster K3d
-echo "🚀 Creating K3d cluster 'sben-tayS'..."
-k3d cluster create sben-tayS || echo "Cluster already exists"
+echo "Creating K3d cluster 'sben-tayS'..."
+if ! k3d cluster create sben-tayS > /dev/null 2>&1; then
+    echo "[WARNING] Cluster sben-tayS already exists. Deleting and recreating..."
+     k3d cluster delete sben-tayS > /dev/null 2>&1
+     k3d cluster create sben-tayS > /dev/null 2>&1
+     echo "Cluster recreated. ✓"
+fi
+
 
 # Attendre que le cluster soit prêt
-echo "⏳ Waiting for cluster to be ready..."
-kubectl wait --for=condition=Ready nodes --all --timeout=60s
+echo -n "Waiting for cluster to be ready..."
+kubectl wait --for=condition=Ready nodes --all --timeout=60s > /dev/null 2>&1 &
+spinner $!
+echo " ✓"
+
 
 echo ""
-echo "✅ K3d cluster is ready"
+echo "K3d cluster is ready ✓"
 echo ""
 
 # Créer le namespace argocd
-echo "📦 Installing ArgoCD..."
-kubectl create namespace argocd 2>/dev/null || echo "Namespace argocd already exists"
+echo "setup ArgoCD..."
+
+echo "Creating namespace 'argocd'..."
+kubectl create namespace argocd > /dev/null 2>&1 || echo "Namespace argocd already exists"
 
 # Installer ArgoCD
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+echo "Installing ArgoCD in 'argocd' namespace..."
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml > /dev/null 2>&1
 
 # Attendre que les pods soient prêts
-echo "⏳ Waiting for ArgoCD pods to be ready (this may take 2-3 minutes)..."
-kubectl wait --for=condition=Ready pods --all -n argocd --timeout=300s
+echo -n "Waiting for ArgoCD pods to be ready (this may take 2-3 minutes)..."
+kubectl wait --for=condition=Ready pods --all -n argocd --timeout=300s > /dev/null 2>&1 &
+spinner $!
+echo " ✓"
 
 echo ""
-echo "✅ ArgoCD is ready"
+echo "ArgoCD is ready ✓"
 echo ""
 
 # Récupérer le mot de passe admin
-echo "🔑 ArgoCD admin password:"
-PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
-echo "$PASSWORD"
+PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d) && \
 echo "$PASSWORD" > ../confs/.argocd_password.txt
 echo ""
 
 # Créer le projet ArgoCD development
-echo "📋 Creating ArgoCD project 'development'..."
-kubectl apply -f ../confs/projects.yaml
+echo "Creating ArgoCD project 'development'..."
+kubectl apply -f ../confs/argoCD/projects.yaml
 
-# Appliquer l'application ArgoCD
-echo "📋 Creating ArgoCD application 'myapp'..."
-kubectl apply -f ../confs/app.yaml
+# Appliquer l'application ArgoCD    
+echo "Creating ArgoCD application 'myapp'..."
+kubectl apply -f ../confs/argoCD/app.yaml
 echo ""
-echo "✅ ArgoCD Application created"
+echo "ArgoCD Application created ✓"
 echo ""
 
 # Port-forward ArgoCD UI en arrière-plan
@@ -61,9 +90,12 @@ echo "======================================"
 echo "  ✅ P3 Installation Complete!"
 echo "======================================"
 echo ""
+echo "'--------------------"
 echo "ArgoCD UI: https://localhost:8080"
+open "https://localhost:8080"
 echo "Username: admin"
-echo "Password: $PASSWORD (also saved in ../confs/.argocd_password.txt)"
+echo "Password: $PASSWORD (also saved in ../confs.argocd_password.txt)"
+echo "'--------------------"
 echo ""
 echo "Check the application:"
 echo "  kubectl get applications -n argocd"
@@ -72,8 +104,5 @@ echo ""
 echo "Test the app:"
 echo "  kubectl exec -n dev deploy/wil-playground -- wget -qO- localhost:8888"
 echo ""
-echo "To change version (v1 → v2):"
-echo "  Edit deployment.yaml in GitHub repo"
-echo "  ArgoCD will auto-sync in ~3 minutes"
+echo "To change version (v1 → v2): use push_git.sh script"
 echo ""
-

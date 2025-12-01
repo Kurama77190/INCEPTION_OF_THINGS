@@ -8,7 +8,7 @@ spec:
   
   # Repos autorisés
   sourceRepos:
-  - '*'  # Tous les repos (ou spécifie le tien)
+  - 'https://github.com/Kurama77190/iot-manifests'
   
   # Destinations autorisées
   destinations:
