@@ -20,6 +20,17 @@ spinner() {
 }
 
 echo "======================================"
+echo "  P3: Clear Previous Installations"
+echo "======================================"
+
+# Remettre will42/playground à la version v1
+echo "Resetting will42/playground to version v1 on github..."
+./push_git.sh << EOF
+1
+EOF
+echo "Reset complete. ✓"
+
+echo "======================================"
 echo "  P3: K3d + ArgoCD Installation"
 echo "======================================"
 
