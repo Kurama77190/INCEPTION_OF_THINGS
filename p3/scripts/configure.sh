@@ -78,7 +78,7 @@ echo -e "${GREEN}ArgoCD is ready ✓${NC}"
 
 # Récupérer le mot de passe admin
 PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d) && \
-echo "$PASSWORD" > ../confs/.argocd_password.txtecho ""
+echo "$PASSWORD" > ../confs/.argocd_password.txt
 
 # Créer le projet ArgoCD development
 echo -e "${BLUE}Creating ArgoCD project 'development'...${GREEN}"
