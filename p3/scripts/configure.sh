@@ -2,6 +2,15 @@
 
 set -e
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+NC='\033[0m'
+
 # Fonction spinner
 spinner() {
     local pid=$1
@@ -19,88 +28,78 @@ spinner() {
     tput cnorm  # Réafficher le curseur
 }
 
+echo -e "${MAGENTA}"
 echo "======================================"
 echo "  P3: Clear Previous Installations"
 echo "======================================"
 
 # Remettre will42/playground à la version v1
-echo "Resetting will42/playground to version v1 on github..."
-./push_git.sh << EOF
+echo -e "${BLUE}Resetting will42/playground to version v1 on github...${NC}"
+./push_git.sh << EOF > /dev/null 2>&1
 1
 EOF
-echo "Reset complete. ✓"
+echo -e "${GREEN}Reset complete. ✓${NC}"
 
+echo -e "${MAGENTA}"
 echo "======================================"
 echo "  P3: K3d + ArgoCD Installation"
 echo "======================================"
 
 # Créer le cluster K3d
-echo "Creating K3d cluster 'sben-tayS'..."
+echo -e "${BLUE}Creating K3d cluster 'sben-tayS'...${NC}"
 if ! k3d cluster create sben-tayS > /dev/null 2>&1; then
-    echo "[WARNING] Cluster sben-tayS already exists. Deleting and recreating..."
+    echo -e "${YELLOW}[WARNING] Cluster sben-tayS already exists. Deleting and recreating...${NC}"
      k3d cluster delete sben-tayS > /dev/null 2>&1
      k3d cluster create sben-tayS > /dev/null 2>&1
-     echo "Cluster recreated. ✓"
+     echo -e "${GREEN}Cluster recreated. ✓${NC}"
 fi
 
 
 # Attendre que le cluster soit prêt
-echo -n "Waiting for cluster to be ready..."
+echo -e "${BLUE}Waiting for cluster to be ready...${NC}"
 kubectl wait --for=condition=Ready nodes --all --timeout=60s > /dev/null 2>&1 &
 spinner $!
-echo " ✓"
-
-
-echo ""
-echo "K3d cluster is ready ✓"
-echo ""
+echo -e "${GREEN}K3d cluster is ready ✓${NC}"
 
 # Créer le namespace argocd
-echo "setup ArgoCD..."
-
-echo "Creating namespace 'argocd'..."
-kubectl create namespace argocd > /dev/null 2>&1 || echo "Namespace argocd already exists"
+echo -e "${BLUE}Setting up ArgoCD...${NC}"
+echo -e "${BLUE}Creating namespace 'argocd'...${NC}"
+kubectl create namespace argocd > /dev/null 2>&1
 
 # Installer ArgoCD
-echo "Installing ArgoCD in 'argocd' namespace..."
+echo -e "${BLUE}Installing ArgoCD in 'argocd' namespace...${NC}"
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml > /dev/null 2>&1
 
 # Attendre que les pods soient prêts
-echo -n "Waiting for ArgoCD pods to be ready (this may take 2-3 minutes)..."
+echo -e "${BLUE}Waiting for ArgoCD pods to be ready (this may take 2-3 minutes)..."
 kubectl wait --for=condition=Ready pods --all -n argocd --timeout=300s > /dev/null 2>&1 &
 spinner $!
-echo " ✓"
-
-echo ""
-echo "ArgoCD is ready ✓"
-echo ""
+echo -e "${GREEN}ArgoCD is ready ✓${NC}"
 
 # Récupérer le mot de passe admin
 PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d) && \
-echo "$PASSWORD" > ../confs/.argocd_password.txt
-echo ""
+echo "$PASSWORD" > ../confs/.argocd_password.txtecho ""
 
 # Créer le projet ArgoCD development
-echo "Creating ArgoCD project 'development'..."
-kubectl apply -f ../confs/argoCD/projects.yaml
+echo -e "${BLUE}Creating ArgoCD project 'development'...${GREEN}"
+kubectl apply -f ../confs/argoCD/projects.yaml 2>&1
 
 # Appliquer l'application ArgoCD    
-echo "Creating ArgoCD application 'myapp'..."
-kubectl apply -f ../confs/argoCD/app.yaml
-echo ""
-echo "ArgoCD Application created ✓"
+echo -e "${BLUE}Creating ArgoCD application 'myapp'...${GREEN}"
+kubectl apply -f ../confs/argoCD/app.yaml 2>&1
+# echo -e "${GREEN}ArgoCD Application created ✓${NC}"
 echo ""
 
 # Port-forward ArgoCD UI en arrière-plan
-echo "🌐 Starting ArgoCD UI port-forward..."
+echo -e "${WHITE}🌐 Starting ArgoCD UI port-forward..."
 kubectl port-forward -n argocd --address=0.0.0.0 svc/argocd-server 8080:443 > /tmp/argocd-portforward.log 2>&1 &
 echo $! > /tmp/argocd-portforward.pid
 
-echo ""
+echo -e "${MAGENTA}"
 echo "======================================"
 echo "  ✅ P3 Installation Complete!"
 echo "======================================"
-echo ""
+echo -e "${WHITE}"
 echo "'--------------------"
 echo "ArgoCD UI: https://localhost:8080"
 open "https://localhost:8080"
