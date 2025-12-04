@@ -12,3 +12,8 @@ vagrant.log
 *.key
 *.pem
 
+# ArgoCD password file
+.argocd_password.txt
+
+# GitLab temporary git repo
+.confs/.gitlab/
