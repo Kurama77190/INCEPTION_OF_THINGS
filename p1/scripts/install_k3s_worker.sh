@@ -3,7 +3,7 @@ sudo apt update -y
 sudo apt-get install -y curl
 
 mkdir -p ~/.ssh
-if [-z cp /vagrant/.vagrant/machines/sben-tayS/libvirt/private_key ~/.ssh/id_rsa_master
+cp /vagrant/.vagrant/machines/sben-tayS/libvirt/private_key ~/.ssh/id_rsa_master
 chmod 600 ~/.ssh/id_rsa_master
 ssh-keyscan -H 192.168.56.110 >> ~/.ssh/known_hosts
 
