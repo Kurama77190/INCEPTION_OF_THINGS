@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: development
+  namespace: argocd
+spec:
+  description: Development project for IoT 42 applications
+  
+  # Repos autorisés
+  sourceRepos:
+  - 'http://gitlab-webservice-default.gitlab.svc.cluster.local:8181/root/iot-manifests.git'
+  #- 'http://gitlab-webservice-default.gitlab.svc.cluster.local:8181/*'
+  
+  # Destinations autorisées
+  destinations:
+  - namespace: '*'  # Tous les namespaces
+    server: https://kubernetes.default.svc
+  
+  # Permissions
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'

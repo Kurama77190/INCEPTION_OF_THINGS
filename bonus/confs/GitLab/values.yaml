@@ -1,0 +1,96 @@
+# Configuration GitLab optimisée pour environnement local
+# Réduit les ressources nécessaires tout en gardant les fonctionnalités essentielles
+
+global:
+  # Configuration du domaine
+  hosts:
+    domain: localhost
+    https: false
+    externalIP: 127.0.0.1
+    ssh: gitlab.localhost
+  
+  # Configuration SSH
+  shell:
+    port: 2222
+  
+  # Édition Community (gratuite)
+  edition: ce
+  
+  # Configuration des certificats
+  ingress:
+    configureCertmanager: false
+    enabled: false
+    tls:
+      enabled: false
+
+# Désactiver Nginx Ingress (K3d a déjà Traefik)
+nginx-ingress:
+  enabled: false
+
+# Désactiver Prometheus (monitoring non nécessaire)
+prometheus:
+  install: false
+
+# Désactiver GitLab Runner (CI/CD non nécessaire pour le test)
+gitlab-runner:
+  install: false
+
+# Désactiver le Registry Docker (non nécessaire)
+registry:
+  enabled: false
+
+# Configuration PostgreSQL (base de données)
+postgresql:
+  install: true
+  metrics:
+    enabled: false
+  resources:
+    requests:
+      cpu: 500m
+      memory: 2Gi
+
+# Configuration Redis (cache)
+redis:
+  install: true
+  metrics:
+    enabled: false
+
+# Configuration GitLab WebService
+gitlab:
+  gitlab-shell:
+    enabled: true
+  
+  webservice:
+    minReplicas: 1
+    maxReplicas: 1
+    resources:
+      requests:
+        cpu: 200m
+        memory: 1Gi
+  
+  # Configuration Sidekiq (jobs asynchrones)
+  sidekiq:
+    minReplicas: 1
+    maxReplicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+  
+  # Configuration Gitaly (stockage Git)
+  gitaly:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+
+# Désactiver les fonctionnalités supplémentaires
+grafana:
+  enabled: false
+
+minio:
+  install: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
