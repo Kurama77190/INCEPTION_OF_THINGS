@@ -32,6 +32,11 @@ rm -f ../confs/.argocd_password.txt
 rm -f /tmp/argocd-portforward.log
 echo -e "${GREEN}Cleanup complete ✓${NC}"
 
+# Netoyer les images Docker utilisées
+echo -e "${BLUE}Removing Docker images used...${NC}"
+docker system prune -a --volumes -f > /dev/null 2>&1
+echo -e "${GREEN}Docker images removed ✓${NC}"
+
 echo -e "${MAGENTA}"
 echo "======================================"
 echo "  ✅ P3 Cleanup Complete!"
