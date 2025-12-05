@@ -82,7 +82,7 @@ helm upgrade --install gitlab gitlab/gitlab \
   --create-namespace \
   -f ../confs/GitLab/values.yaml \
   --set certmanager-issuer.email=false \
-  --timeout 15m #> /dev/null 2>&1
+  --timeout 15m > /dev/null 2>&1
 
 # Attendre que GitLab soit prêt
 echo -e "${BLUE}Waiting for GitLab pods to be ready ..."
@@ -176,6 +176,11 @@ echo -e "${BLUE}Adding Git repository to GitLab project...${NC}"
 ./push_gitlab.sh << EOF > /dev/null 2>&1
 1
 EOF
+if ["$?" == 0]; then
+    echo -e "{GREEN}Monitoring Repository is ready ✓${NC}"
+else
+    echo -e "{RED}ERR: Monitoring not ready, try again.${NC}"
+fi
 
 # Créer le projet ArgoCD development
 echo -e "${BLUE}Creating ArgoCD project 'development'...${NC}"

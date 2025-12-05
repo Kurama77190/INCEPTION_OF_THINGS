@@ -4,6 +4,7 @@ GITLAB_TOKEN=$(cat ../confs/.gitlab_token.txt)
 
 if [ ! -d "../confs/repo_gitlab" ]; then
     cd ../confs
+    ssh-keygen -f '/home/sben-tay/.ssh/known_hosts' -R '[gitlab.localhost]:2222' > /dev/null 2>&1
     git clone ssh://git@gitlab.localhost:2222/root/iot-manifests.git repo_gitlab
     cd repo_gitlab
     mkdir manifests
@@ -13,7 +14,11 @@ if [ ! -d "../confs/repo_gitlab" ]; then
     git add manifests/
     git commit -m "Initial commit with will42/playground:v1 manifests"
     git push
-    exit 0
+    if [ -d "../confs/repo_gitlab" ]; then
+        exit 0
+    else
+	exit 1
+    fi
 fi
 
 echo "choose version of will42/playground to deploy:"

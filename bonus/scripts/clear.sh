@@ -50,7 +50,7 @@ echo -e "${GREEN}Cleanup complete ✓${NC}"
 
 # Netoyer les images Docker utilisées
 echo -e "${BLUE}Removing Docker images used...${NC}"
-docker system prune -a --volumes -f
+docker system prune -a --volumes -f > /dev/null 2>&1
 echo -e "${GREEN}Docker images removed ✓${NC}"
 
 # Supprimer le dépôt Git cloné
