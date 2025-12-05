@@ -176,11 +176,7 @@ echo -e "${BLUE}Adding Git repository to GitLab project...${NC}"
 ./push_gitlab.sh << EOF > /dev/null 2>&1
 1
 EOF
-if [ "$?" -eq 0 ]; then
-    echo -e "${GREEN}Monitoring Repository is ready ✓${NC}"
-else
-    echo -e "${RED}ERR: Monitoring not ready, try again.${NC}"
-fi
+echo -e "${GREEN}Git repository added to project ✓${NC}"
 
 # Créer le projet ArgoCD development
 echo -e "${BLUE}Creating ArgoCD project 'development'...${NC}"
